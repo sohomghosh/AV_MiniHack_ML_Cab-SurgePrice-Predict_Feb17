@@ -66,6 +66,49 @@ test_preds = bst.predict(dtest)
 submit = pd.DataFrame({'Trip_ID': test['Trip_ID'], 'Surge_Pricing_Type': test_preds + 1})
 submit.to_csv("XGB.csv", index=False)
 
+
+
+
+
+###########################################################################################################################
+def create_feature_map(features):
+    outfile = open('xgb.fmap', 'w')
+    for i, feat in enumerate(features):
+        outfile.write('{0}\t{1}\tq\n'.format(i,feat))
+    outfile.close()
+
+create_feature_map(features)
+bst.dump_model('xgbmodel.txt', 'xgb.fmap', with_stats=True)
+importance = bst.get_fscore(fmap='xgb.fmap')
+importance = sorted(importance.items(), key=operator.itemgetter(1), reverse=True)
+imp_df = pd.DataFrame(importance, columns=['feature','fscore'])
+imp_df['fscore'] = imp_df['fscore'] / imp_df['fscore'].sum()
+imp_df.to_csv("imp_feat.txt", index=False)
+
+
+# create a function for labeling #
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()/2., 1.02*height,
+                '%f' % float(height),
+                ha='center', va='bottom')
+
+
+#imp_df = pd.read_csv('imp_feat.txt')
+labels = np.array(imp_df.feature.values)
+ind = np.arange(len(labels))
+width = 0.9
+fig, ax = plt.subplots(figsize=(12,6))
+rects = ax.bar(ind, np.array(imp_df.fscore.values), width=width, color='y')
+ax.set_xticks(ind+((width)/2.))
+ax.set_xticklabels(labels, rotation='vertical')
+ax.set_ylabel("Importance score")
+ax.set_title("Variable importance")
+autolabel(rects)
+plt.show()
+###########################################################################################################################
+
 #train_test["Type_of_Cab"] = train_test["Type_of_Cab"].astype('category')
 #train_test["Confidence_Life_Style_Index"] = train_test["Confidence_Life_Style_Index"].astype('category')
 #train_test["Destination_Type"] = train_test["Destination_Type"].astype('category')
