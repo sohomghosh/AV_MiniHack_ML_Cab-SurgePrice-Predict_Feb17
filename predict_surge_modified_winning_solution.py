@@ -49,6 +49,11 @@ params = {"objective": "multi:softmax","booster": "gbtree", "nthread": 4, "silen
 X_train=train_test[0:len(train.index)]
 X_test=train_test[len(train.index):len(train_test.index)]
 
+'''
+train_ids = random.sample(list(data.index),int(.8*len(data.index)))
+train = data[data.index.isin(train_ids)]
+valid = data[~data.index.isin(train_ids)]
+'''
 
 dtrain = xgb.DMatrix(X_train[features], X_train['Surge_Pricing_Type'], missing=np.nan)
 dtest = xgb.DMatrix(X_test[features], missing=np.nan)
