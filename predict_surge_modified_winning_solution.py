@@ -9,6 +9,7 @@ import numpy as np
 from sklearn import preprocessing, model_selection, metrics, ensemble
 from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
+import pickle
 train=pd.read_csv("train.csv")
 test=pd.read_csv("test.csv")
 
@@ -62,6 +63,9 @@ nrounds = 260
 watchlist = [(dtrain, 'train')]
 bst = xgb.train(params, dtrain, num_boost_round=nrounds, evals=watchlist, verbose_eval=20)
 test_preds = bst.predict(dtest)
+
+pickle.dump(bst, open("xgb1.pickle.dat", "wb"))
+#loaded_model = pickle.load(open("xgb1.pickle.dat", "rb"))
 
 submit = pd.DataFrame({'Trip_ID': test['Trip_ID'], 'Surge_Pricing_Type': test_preds + 1})
 submit.to_csv("XGB.csv", index=False)
