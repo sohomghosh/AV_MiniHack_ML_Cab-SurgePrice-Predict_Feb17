@@ -64,6 +64,7 @@ watchlist = [(dtrain, 'train')]
 bst = xgb.train(params, dtrain, num_boost_round=nrounds, evals=watchlist, verbose_eval=20)
 test_preds = bst.predict(dtest)
 
+#bst.save_model('xgb1.model')
 pickle.dump(bst, open("xgb1.pickle.dat", "wb"))
 #loaded_model = pickle.load(open("xgb1.pickle.dat", "rb"))
 
